@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">NASA Picture Of The Day</string>
+    <string name="photo_of_the_day_stub">Фото дня</string>
 </resources>
