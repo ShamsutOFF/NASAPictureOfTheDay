@@ -1,4 +1,4 @@
-package com.example.nasapictureoftheday
+package com.example.nasapictureoftheday.model
 
 import android.app.Application
 import okhttp3.Interceptor

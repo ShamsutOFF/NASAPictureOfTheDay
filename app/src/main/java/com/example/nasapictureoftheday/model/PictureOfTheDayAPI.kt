@@ -1,5 +1,6 @@
-package com.example.nasapictureoftheday
+package com.example.nasapictureoftheday.model
 
+import com.example.nasapictureoftheday.BuildConfig
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query

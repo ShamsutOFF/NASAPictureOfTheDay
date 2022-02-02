@@ -1,8 +1,12 @@
-package com.example.nasapictureoftheday
+package com.example.nasapictureoftheday.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.nasapictureoftheday.BuildConfig
+import com.example.nasapictureoftheday.model.PODServerResponseData
+import com.example.nasapictureoftheday.model.PictureOfTheDayAPI
+import com.example.nasapictureoftheday.model.PictureOfTheDayData
 import retrofit2.*
 
 class PictureOfTheDayViewModel (
