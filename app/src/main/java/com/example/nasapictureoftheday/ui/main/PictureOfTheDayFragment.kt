@@ -59,6 +59,7 @@ class PictureOfTheDayFragment : Fragment() {
     private fun initViewModel() {
         viewModel.getPictureOfTheDay(app.retrofit).observe(viewLifecycleOwner) { renderData(it) }
     }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu_bottom_bar, menu)
@@ -66,12 +67,16 @@ class PictureOfTheDayFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.app_bar_fav -> Toast.makeText(context, "Favourite",
-                Toast.LENGTH_SHORT).show()
-            R.id.app_bar_search -> Toast.makeText(context, "Search",
-                Toast.LENGTH_SHORT).show()
-            R.id.app_bar_settings -> Toast.makeText(context, "Settings",
-                Toast.LENGTH_SHORT).show()
+            R.id.app_bar_fav -> Toast.makeText(
+                context, "Favourite",
+                Toast.LENGTH_SHORT
+            ).show()
+            R.id.app_bar_search -> Toast.makeText(
+                context, "Search",
+                Toast.LENGTH_SHORT
+            ).show()
+            R.id.app_bar_settings -> activity?.supportFragmentManager?.beginTransaction()
+                ?.add(R.id.container, ChipsFragment())?.addToBackStack(null)?.commit()
             android.R.id.home -> {
                 activity?.let {
                     BottomNavigationDrawerFragment().show(it.supportFragmentManager, "tag")
@@ -92,15 +97,20 @@ class PictureOfTheDayFragment : Fragment() {
                 bottom_app_bar.navigationIcon = null
                 bottom_app_bar.fabAlignmentMode = BottomAppBar.FAB_ALIGNMENT_MODE_END
                 fab.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_outline_arrow_back_24))
+                    ContextCompat.getDrawable(context, R.drawable.ic_outline_arrow_back_24)
+                )
                 bottom_app_bar.replaceMenu(R.menu.menu_bottom_bar_other_screen)
             } else {
                 isMain = true
                 bottom_app_bar.navigationIcon =
                     ContextCompat.getDrawable(context, R.drawable.ic_baseline_menu)
                 bottom_app_bar.fabAlignmentMode = BottomAppBar.FAB_ALIGNMENT_MODE_CENTER
-                fab.setImageDrawable(ContextCompat.getDrawable(context,
-                    R.drawable.ic_baseline_add_24))
+                fab.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.ic_baseline_add_24
+                    )
+                )
                 bottom_app_bar.replaceMenu(R.menu.menu_bottom_bar)
             }
         }
