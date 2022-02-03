@@ -1,10 +1,13 @@
 package com.example.nasapictureoftheday.ui.main
 
 import android.content.Intent
+import android.icu.util.Calendar
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -17,9 +20,16 @@ import com.example.nasapictureoftheday.viewmodel.PictureOfTheDayViewModel
 import com.example.nasapictureoftheday.R
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.bottom_sheet_layout.*
+import kotlinx.android.synthetic.main.chips_fragment.*
 import kotlinx.android.synthetic.main.picture_of_the_day_fragment.*
+import kotlinx.android.synthetic.main.picture_of_the_day_fragment.chipGroup
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.time.days
 
 class PictureOfTheDayFragment : Fragment() {
 
@@ -42,12 +52,13 @@ class PictureOfTheDayFragment : Fragment() {
         return inflater.inflate(R.layout.picture_of_the_day_fragment, container, false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViewModel()
         setBottomSheetBehavior(bottom_sheet_container)
         setBottomAppBar(view)
-//        setBottomSheetBehavior(view.findViewById(R.id.bottom_sheet_container))
+        chipChoseLst()
 
         input_layout.setEndIconOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW).apply {
@@ -56,8 +67,42 @@ class PictureOfTheDayFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun chipChoseLst() {
+        val myDateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd")
+        val today = myDateFormat.format(Calendar.getInstance().time)
+        val yesterday = myDateFormat.format(Calendar.getInstance().run {
+            add(Calendar.DAY_OF_MONTH, -1)
+            time  })
+        val dayBeforeYesterday = myDateFormat.format(Calendar.getInstance().run {
+            add(Calendar.DAY_OF_MONTH, -2)
+            time  })
+
+        chipGroup.setOnCheckedChangeListener { chipGroup, position ->
+            chipGroup.findViewById<Chip>(position)?.let {
+                when (position) {
+                    1 -> {
+                        viewModel.getPictureOfTheDay(app.retrofit, dayBeforeYesterday).observe(viewLifecycleOwner) { renderData(it) }
+                        date_tv.text =
+                            "dayBeforeYesterday = $dayBeforeYesterday\n"
+                    }
+                    2 -> {
+                        viewModel.getPictureOfTheDay(app.retrofit, yesterday).observe(viewLifecycleOwner) { renderData(it) }
+                        date_tv.text =
+                            "yesterday = $yesterday\n"
+                    }
+                    3 -> {
+                        viewModel.getPictureOfTheDay(app.retrofit, today).observe(viewLifecycleOwner) { renderData(it) }
+                        date_tv.text =
+                            "today = $today\n"
+                    }
+                }
+            }
+        }
+    }
+
     private fun initViewModel() {
-        viewModel.getPictureOfTheDay(app.retrofit).observe(viewLifecycleOwner) { renderData(it) }
+        viewModel.getPictureOfTheDay(app.retrofit,"").observe(viewLifecycleOwner) { renderData(it) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -124,6 +169,7 @@ class PictureOfTheDayFragment : Fragment() {
     private fun renderData(data: PictureOfTheDayData) {
         when (data) {
             is PictureOfTheDayData.Success -> {
+                progress_bar.visibility = View.GONE
                 val serverResponseData = data.serverResponseData
                 val url = serverResponseData.url
                 if (url.isNullOrEmpty()) {
@@ -139,9 +185,10 @@ class PictureOfTheDayFragment : Fragment() {
                 }
             }
             is PictureOfTheDayData.Loading -> {
-                //TODO Добавить экран загрузки
+                progress_bar.visibility = View.VISIBLE
             }
             is PictureOfTheDayData.Error -> {
+                progress_bar.visibility = View.GONE
                 view?.let {
                     Snackbar.make(it, "Ошибка! ${data.error.message}", Snackbar.LENGTH_INDEFINITE)
                         .setAction(
