@@ -1,10 +1,13 @@
 package com.example.nasapictureoftheday.ui.main
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.icu.util.Calendar
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -23,13 +26,14 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.bottom_sheet_layout.*
-import kotlinx.android.synthetic.main.chips_fragment.*
 import kotlinx.android.synthetic.main.picture_of_the_day_fragment.*
 import kotlinx.android.synthetic.main.picture_of_the_day_fragment.chipGroup
+import kotlinx.android.synthetic.main.settings_fragment.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.time.days
+
+private const val TAG = "@@@ PictureOfTheDayFragment"
 
 class PictureOfTheDayFragment : Fragment() {
 
@@ -46,14 +50,18 @@ class PictureOfTheDayFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
+        Log.d(TAG,
+            "onCreateView() called with: inflater = $inflater, container = $container, savedInstanceState = $savedInstanceState")
         viewModel = ViewModelProvider(this)[PictureOfTheDayViewModel::class.java]
         return inflater.inflate(R.layout.picture_of_the_day_fragment, container, false)
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Log.d(TAG,
+            "onViewCreated() called with: view = $view, savedInstanceState = $savedInstanceState")
         super.onViewCreated(view, savedInstanceState)
         initViewModel()
         setBottomSheetBehavior(bottom_sheet_container)
@@ -69,32 +77,28 @@ class PictureOfTheDayFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun chipChoseLst() {
+        Log.d(TAG, "chipChoseLst() called")
         val myDateFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd")
         val today = myDateFormat.format(Calendar.getInstance().time)
         val yesterday = myDateFormat.format(Calendar.getInstance().run {
             add(Calendar.DAY_OF_MONTH, -1)
-            time  })
+            time
+        })
         val dayBeforeYesterday = myDateFormat.format(Calendar.getInstance().run {
             add(Calendar.DAY_OF_MONTH, -2)
-            time  })
-
+            time
+        })
         chipGroup.setOnCheckedChangeListener { chipGroup, position ->
             chipGroup.findViewById<Chip>(position)?.let {
                 when (position) {
-                    1 -> {
-                        viewModel.getPictureOfTheDay(app.retrofit, dayBeforeYesterday).observe(viewLifecycleOwner) { renderData(it) }
-                        date_tv.text =
-                            "dayBeforeYesterday = $dayBeforeYesterday\n"
+                    chip1_from_chip_group.id -> {
+                        viewModel.getPictureOfTheDay(app.retrofit, dayBeforeYesterday)
                     }
-                    2 -> {
-                        viewModel.getPictureOfTheDay(app.retrofit, yesterday).observe(viewLifecycleOwner) { renderData(it) }
-                        date_tv.text =
-                            "yesterday = $yesterday\n"
+                    chip2_from_chip_group.id -> {
+                        viewModel.getPictureOfTheDay(app.retrofit, yesterday)
                     }
-                    3 -> {
-                        viewModel.getPictureOfTheDay(app.retrofit, today).observe(viewLifecycleOwner) { renderData(it) }
-                        date_tv.text =
-                            "today = $today\n"
+                    chip3_from_chip_group.id -> {
+                        viewModel.getPictureOfTheDay(app.retrofit, today)
                     }
                 }
             }
@@ -102,15 +106,19 @@ class PictureOfTheDayFragment : Fragment() {
     }
 
     private fun initViewModel() {
-        viewModel.getPictureOfTheDay(app.retrofit,"").observe(viewLifecycleOwner) { renderData(it) }
+        Log.d(TAG, "initViewModel() called")
+        viewModel.getPictureOfTheDay(app.retrofit, "")
+            .observe(viewLifecycleOwner) { renderData(it) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        Log.d(TAG, "onCreateOptionsMenu() called with: menu = $menu, inflater = $inflater")
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu_bottom_bar, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.d(TAG, "onOptionsItemSelected() called with: item = $item")
         when (item.itemId) {
             R.id.app_bar_fav -> Toast.makeText(
                 context, "Favourite",
@@ -120,8 +128,11 @@ class PictureOfTheDayFragment : Fragment() {
                 context, "Search",
                 Toast.LENGTH_SHORT
             ).show()
-            R.id.app_bar_settings -> activity?.supportFragmentManager?.beginTransaction()
-                ?.add(R.id.container, ChipsFragment())?.addToBackStack(null)?.commit()
+            R.id.app_bar_settings -> activity?.supportFragmentManager
+                ?.beginTransaction()
+                ?.add(R.id.container, SettingsFragment())
+                ?.addToBackStack(null)
+                ?.commit()
             android.R.id.home -> {
                 activity?.let {
                     BottomNavigationDrawerFragment().show(it.supportFragmentManager, "tag")
@@ -132,6 +143,7 @@ class PictureOfTheDayFragment : Fragment() {
     }
 
     private fun setBottomAppBar(view: View) {
+        Log.d(TAG, "setBottomAppBar() called with: view = $view")
         val context = activity as MainActivity
         context.setSupportActionBar(bottom_app_bar)
         setHasOptionsMenu(true)
@@ -162,11 +174,13 @@ class PictureOfTheDayFragment : Fragment() {
     }
 
     private fun setBottomSheetBehavior(bottomSheet: ConstraintLayout) {
+        Log.d(TAG, "setBottomSheetBehavior() called with: bottomSheet = $bottomSheet")
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
     private fun renderData(data: PictureOfTheDayData) {
+        Log.d(TAG, "renderData() called with: data = $data")
         when (data) {
             is PictureOfTheDayData.Success -> {
                 progress_bar.visibility = View.GONE

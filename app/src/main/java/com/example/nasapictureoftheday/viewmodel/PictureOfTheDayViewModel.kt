@@ -1,5 +1,6 @@
 package com.example.nasapictureoftheday.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,12 +10,15 @@ import com.example.nasapictureoftheday.model.PictureOfTheDayAPI
 import com.example.nasapictureoftheday.model.PictureOfTheDayData
 import retrofit2.*
 
+private const val TAG = "@@@ PODViewModel"
+
 class PictureOfTheDayViewModel(
     private val liveDataForViewToObserve: MutableLiveData<PictureOfTheDayData> =
         MutableLiveData()
 ) :
     ViewModel() {
     fun getPictureOfTheDay(retrofit: Retrofit, date: String): LiveData<PictureOfTheDayData> {
+        Log.d(TAG, "getPictureOfTheDay() called with: retrofit = $retrofit, date = $date")
         sendServerRequest(retrofit, date)
         return liveDataForViewToObserve
     }
@@ -31,6 +35,7 @@ class PictureOfTheDayViewModel(
                     call: Call<PODServerResponseData>,
                     response: Response<PODServerResponseData>
                 ) {
+                    Log.d(TAG, "onResponse() called with: call = $call, response = $response")
                     if (response.isSuccessful && response.body() != null) {
                         liveDataForViewToObserve.value =
                             PictureOfTheDayData.Success(response.body()!!)

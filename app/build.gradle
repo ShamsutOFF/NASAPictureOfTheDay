@@ -13,15 +13,19 @@ android {
         targetSdk 31
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes.each {
         Properties properties = new Properties()
-        properties.load(project.rootProject.file("nasa_apikey.properties").newDataInputStream())
+        properties.load(project.rootProject.file("app.properties").newDataInputStream())
         def apiKey = properties.getProperty("nasa_api_key", "")
         it.buildConfigField "String", "NASA_API_KEY", apiKey
+    }
+
+    //Binding
+    buildFeatures {
+        viewBinding true
     }
 
     buildTypes {
@@ -49,7 +53,7 @@ dependencies {
 //Kotlin
 //    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-//Koil image download (аналог Picasso и Glide, написанный на Kotlin)
+//Coil image download (аналог Picasso и Glide, написанный на Kotlin)
     implementation("io.coil-kt:coil:1.3.2")
 
     implementation 'androidx.core:core-ktx:1.7.0'
