@@ -5,9 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.nasapictureoftheday.ui.main.PictureOfTheDayFragment
 
-private const val NAME_SHARED_PREFERENCE = "LOGIN"
 private const val APP_THEME = "APP_THEME"
-private const val TAG = "@@@ PictureOfTheDayFragment"
+private const val TAG = "@@@ MainActivity"
 
 class MainActivity : AppCompatActivity() {
 
