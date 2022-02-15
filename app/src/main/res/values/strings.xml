@@ -3,4 +3,6 @@
     <string name="photo_of_the_day_stub">Фото дня</string>
     <string name="search_wiki">Найти термин в Википедии</string>
     <string name="wiki_helper_text">Количество символов</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

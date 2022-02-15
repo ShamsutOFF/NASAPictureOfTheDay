@@ -4,7 +4,7 @@
         <item
             android:id="@+id/navigation_one"
             android:icon="@drawable/ic_outline_archive_24"
-            android:title="На экран 1" />
+            android:title="На экран пейджера" />
         <item
             android:id="@+id/navigation_two"
             android:icon="@drawable/ic_outline_send_24"

@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NASAPictureOfTheDay">
         <activity
+            android:name=".PagerActivity"
+            android:exported="true" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
